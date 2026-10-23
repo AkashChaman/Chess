@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Chess Master - Real-time Online & Local Chess</title>
+  <meta name="description" content="A modern, fully functional, turn-based Chess game with real-time online multiplayer, pass-and-play, AI, and classic styling.">
+
+  <!-- Modern Google Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 45 45" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M 22.5,11.63 L 22.5,6 M 20,8 L 25,8 M 22.5,25 C 22.5,25 27,17.5 25.5,14.5 C 24,11.5 21,11.5 19.5,14.5 C 18,17.5 22.5,25 22.5,25 M 11.5,37 C 17,40.5 28,40.5 33.5,37 C 36.5,34 38,30 38,26.5 C 38,20 33,16 28.5,17 C 27.5,17.2 25.5,18.5 25.5,18.5 C 25.5,18.5 23.5,17.2 22.5,17 C 18,16 13,20 13,26.5 C 13,30 14.5,34 11.5,37 z" fill="#81b64c"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Chess<span>Master</span></h1>
+          <span class="brand-badge">Pro</span>
+        </div>
+      </div>
+
+      <!-- Mode Selector Pills -->
+      <nav class="mode-nav">
+        <button id="btn-mode-online" class="mode-btn active" data-mode="online">
+          <span class="live-pulse"></span> Online Multiplayer
+        </button>
+        <button id="btn-mode-local" class="mode-btn" data-mode="local">
+          Pass &amp; Play
+        </button>
+        <button id="btn-mode-ai" class="mode-btn" data-mode="ai">
+          Vs Computer
+        </button>
+      </nav>
+
+      <!-- Utility Controls -->
+      <div class="header-actions">
+        <!-- Theme Selector -->
+        <div class="theme-dropdown-wrapper">
+          <label for="theme-select" class="sr-only">Theme</label>
+          <select id="theme-select" class="select-input">
+            <option value="classic">Classic Green</option>
+            <option value="wood">Tournament Wood</option>
+            <option value="midnight">Midnight Slate</option>
+            <option value="glass">Neon Cyber</option>
+          </select>
+        </div>
+
+        <!-- Audio Mute Button -->
+        <button id="btn-sound-toggle" class="icon-btn" title="Toggle Sound Effects" aria-label="Toggle Sound">
+          <svg id="icon-sound-on" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+          <svg id="icon-sound-off" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="hidden">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Game Workspace -->
+  <main class="main-container">
+
+    <!-- LEFT: Chess Board Column -->
+    <section class="board-column">
+      
+      <!-- Top Player Bar (Opponent / Black) -->
+      <div id="player-top" class="player-bar">
+        <div class="player-meta">
+          <div class="player-avatar" id="top-avatar">B</div>
+          <div class="player-details">
+            <div class="player-name-row">
+              <span class="player-name" id="top-name">Opponent</span>
+              <span class="player-color-pill" id="top-color-pill">Black</span>
+            </div>
+            <div class="player-status-row">
+              <span class="captured-box" id="top-captured"></span>
+              <span class="material-advantage" id="top-advantage"></span>
+            </div>
+          </div>
+        </div>
+        <div class="turn-clock-pill hidden" id="top-clock">05:00</div>
+      </div>
+
+      <!-- The Board Frame -->
+      <div class="board-wrapper">
+        <div id="chessboard" class="chessboard classic" tabindex="0" role="region" aria-label="Interactive 8x8 Chessboard">
+          <!-- 64 Squares will be dynamically injected with coordinate markers -->
+        </div>
+
+        <!-- Pawn Promotion Dialog Overlay -->
+        <div id="promotion-overlay" class="promotion-modal hidden">
+          <div class="promotion-card">
+            <h3>Pawn Promotion</h3>
+            <p>Select your replacement piece:</p>
+            <div class="promotion-options" id="promotion-options">
+              <!-- Rendered dynamically based on player's color -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Game Result Overlay Banner -->
+        <div id="game-over-overlay" class="game-over-modal hidden">
+          <div class="game-over-card">
+            <div class="result-badge" id="game-result-badge">Checkmate</div>
+            <h2 id="game-result-title">White Wins!</h2>
+            <p id="game-result-desc">by checkmate</p>
+            <div class="game-over-actions">
+              <button id="btn-result-rematch" class="btn btn-primary">Play Again</button>
+              <button id="btn-result-close" class="btn btn-secondary">Review Board</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Player Bar (User / White) -->
+      <div id="player-bottom" class="player-bar">
+        <div class="player-meta">
+          <div class="player-avatar" id="bottom-avatar">W</div>
+          <div class="player-details">
+            <div class="player-name-row">
+              <span class="player-name" id="bottom-name">You</span>
+              <span class="player-color-pill" id="bottom-color-pill">White</span>
+            </div>
+            <div class="player-status-row">
+              <span class="captured-box" id="bottom-captured"></span>
+              <span class="material-advantage" id="bottom-advantage"></span>
+            </div>
+          </div>
+        </div>
+        <div class="turn-clock-pill hidden" id="bottom-clock">05:00</div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Control & Information Column -->
+    <aside class="sidebar-column">
+
+      <!-- Dynamic Multiplayer Lobby Card (Shown in Online Mode) -->
+      <div id="multiplayer-panel" class="card lobby-card">
+        <div class="card-header">
+          <h3>Online Match Room</h3>
+          <span id="socket-status" class="status-indicator-pill offline">
+            <span class="dot"></span> <span id="socket-status-text">Connecting...</span>
+          </span>
+        </div>
+
+        <!-- Online Lobby Screen: Create or Join -->
+        <div id="online-lobby-view" class="lobby-view">
+          <div class="name-input-group">
+            <label for="input-player-name">Your Display Name:</label>
+            <input type="text" id="input-player-name" placeholder="Enter your name" maxlength="20" value="Player">
+          </div>
+
+          <div class="lobby-action-grid">
+            <!-- Create Room Box -->
+            <div class="action-box">
+              <h4>Start New Game</h4>
+              <p>Generate a room ID and share it with your friend.</p>
+              <button id="btn-create-game" class="btn btn-primary btn-block">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+                Create Game
+              </button>
+            </div>
+
+            <!-- Join Room Box -->
+            <div class="action-box">
+              <h4>Join Existing Game</h4>
+              <p>Enter the 6-character room code from your opponent.</p>
+              <div class="join-input-row">
+                <input type="text" id="input-room-code" placeholder="e.g. 8G5X2A" maxlength="6">
+                <button id="btn-join-game" class="btn btn-secondary">Join</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Room Info (Displayed once created or joined) -->
+        <div id="online-room-view" class="lobby-view hidden">
+          <div class="room-share-box">
+            <div class="room-code-display">
+              <span class="code-label">Room ID:</span>
+              <span id="display-room-code" class="code-text">------</span>
+            </div>
+            <div class="room-share-buttons">
+              <button id="btn-copy-code" class="btn btn-sm btn-secondary" title="Copy Room ID">
+                Copy Code
+              </button>
+              <button id="btn-copy-link" class="btn btn-sm btn-secondary" title="Copy Invite Link">
+                Copy Link
+              </button>
+            </div>
+          </div>
+          <div class="room-waiting-banner" id="room-waiting-banner">
+            <div class="spinner-ring"></div>
+            <span>Waiting for opponent to connect...</span>
+          </div>
+          <div class="room-players-banner hidden" id="room-active-banner">
+            <span class="vs-tag">Match in Progress</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Difficulty Panel (Shown in Vs AI Mode) -->
+      <div id="ai-panel" class="card hidden">
+        <div class="card-header">
+          <h3>Computer Opponent</h3>
+          <span class="badge">AI Engine</span>
+        </div>
+        <div class="ai-controls">
+          <label for="ai-difficulty">Engine Strength:</label>
+          <select id="ai-difficulty" class="select-input">
+            <option value="easy">Casual (Beginner - 800 ELO)</option>
+            <option value="medium" selected>Club Player (Intermediate - 1400 ELO)</option>
+            <option value="hard">Master (Advanced - 1800+ ELO)</option>
+          </select>
+          <div class="ai-side-select">
+            <span>Play as:</span>
+            <div class="btn-group">
+              <button id="btn-ai-play-white" class="btn btn-sm btn-primary active">White</button>
+              <button id="btn-ai-play-black" class="btn btn-sm btn-secondary">Black</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prominent Dynamic Turn Indicator -->
+      <div class="card turn-indicator-card">
+        <div class="turn-indicator-inner" id="turn-indicator">
+          <div class="turn-piece-preview" id="turn-piece-preview"></div>
+          <div class="turn-text-content">
+            <div class="turn-title" id="turn-label">White's Turn</div>
+            <div class="turn-sub" id="turn-sub-label">Waiting for move...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons Bar -->
+      <div class="action-buttons-row">
+        <button id="btn-new-game" class="btn btn-secondary" title="Reset Board and Start New Match">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+          </svg>
+          Reset Game
+        </button>
+
+        <button id="btn-flip-board" class="btn btn-secondary" title="Flip Board Perspective">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+          </svg>
+          Flip Board
+        </button>
+
+        <button id="btn-resign" class="btn btn-danger-outline" title="Resign Match">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-6z"/>
+          </svg>
+          Resign
+        </button>
+      </div>
+
+      <!-- Move History Sidebar with Standard Algebraic Notation -->
+      <div class="card history-card">
+        <div class="card-header">
+          <h3>Move History</h3>
+          <span class="badge" id="move-count-badge">0 Moves</span>
+        </div>
+        <div class="move-history-container" id="move-history-list">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th class="col-num">#</th>
+                <th class="col-white">White</th>
+                <th class="col-black">Black</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody">
+              <!-- Dynamically populated rows: 1. e4 e5, 2. Nf3 Nc6, etc. -->
+              <tr class="empty-history-row">
+                <td colspan="3">Moves will appear here</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- In-Room Live Chat / Announcement Panel for Online Matches -->
+      <div id="chat-section" class="card chat-card">
+        <div class="card-header">
+          <h3>Match Chat</h3>
+          <span class="badge online-badge">Live</span>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-system-msg">Game room ready. Say hello!</div>
+        </div>
+        <form id="chat-form" class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="Type a message..." maxlength="120" autocomplete="off">
+          <button type="submit" class="btn btn-sm btn-primary">Send</button>
+        </form>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- Load Socket.io client script served directly by Socket.io server -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <!-- Modular Scripts -->
+  <script src="pieces.js"></script>
+  <script src="chess-core.js"></script>
+  <script src="audio.js"></script>
+  <script src="ai.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
